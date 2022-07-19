@@ -1,3 +1,8 @@
 #!/bin/bash
 
-docker run --rm -v $(pwd):/src -w /src node:18-alpine node $1
+docker run \
+	--rm 			`# remove container when done` \
+	-v $(pwd):/src	`# bind source folder` \
+	-w /src			`# set workdir` \
+	node:18-alpine	`# use node 18` \
+	$@				`# run command`
