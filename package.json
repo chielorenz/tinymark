@@ -2,5 +2,11 @@
 	"name": "tinymark",
 	"description": "Proof of concept lexer, parser, and compiler for a tiny subset of the Markdown syntax",
 	"version": "0.0.1",
-	"type": "module"
+	"type": "module",
+	"scripts": {
+		"nodemon": "nodemon"
+	},
+	"devDependencies": {
+		"nodemon": "^2.0.19"
+	}
 }
