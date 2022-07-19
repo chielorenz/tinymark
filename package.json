@@ -1,6 +1,6 @@
 {
 	"name": "tinymark",
-	"description": "Proof of concept lexer, parser and compiler for a tiny subset of Markdown syntax",
+	"description": "Proof of concept lexer, parser, and compiler for a tiny subset of the Markdown syntax",
 	"version": "0.0.1",
 	"type": "module"
 }
