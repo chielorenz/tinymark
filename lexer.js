@@ -2,10 +2,7 @@ import { readFile } from "fs/promises";
 
 const regex = {
 	nl: /[\r\n]+/y,
-	// ws: /\s+/y,
-	h3: /#{3}/y,
-	h2: /#{2}/y,
-	h1: /#/y,
+	hash: /#/y,
 	text: /[^\n\r]+/y,
 };
 
@@ -32,7 +29,7 @@ export default {
 		// If not match is found but it didn't reach the end of the input
 		if (!token && this.index != this.raw.length) {
 			const string = this.raw.slice(this.index);
-			throw new Error(`No token found but input not empty: "${string}"`);
+			throw new Error(`No match found, but input not empty: "${string}"`);
 		}
 
 		return token;
