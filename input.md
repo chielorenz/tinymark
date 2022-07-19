@@ -1,3 +1,5 @@
-# Input file
+# Heading 1
+This is the input file to test the compiler
 
-This is the input file to test the compiler, it only contain an h1 and a p
+## Heading 2
+This is the input file to test the compiler
