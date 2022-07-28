@@ -1,7 +1,7 @@
 #!/bin/bash
 
 docker run \
-	--rm 			`# remove container when done` \
+	--rm			`# remove container when done` \
 	-it				`# make it interactive` \
 	-v $(pwd):/src	`# bind source folder` \
 	-w /src			`# set workdir` \

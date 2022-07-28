@@ -1,5 +1,5 @@
 # Heading 1
-This is the input file to test the compiler
+First paragraph
 
 ## Heading 2
-This is the input file to test the compiler
+Second paragraph
