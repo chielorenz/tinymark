@@ -18,11 +18,11 @@ sh ./run npm install
 Run a script:
 
 ```bash
-sh ./run node index.js
+sh ./run node src/index.js
 ```
 
 Run a script and watch it with [nodemon](https://www.npmjs.com/package/nodemon):
 
 ```bash
-sh ./run npm run nodemon index.js
+sh ./run npm run nodemon src/index.js
 ```
