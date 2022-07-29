@@ -56,3 +56,8 @@ Todo -->
 <!-- ## ✍️ Generator
 
 Todo -->
+
+---
+
+- Logo inspiration: [Astronaut by Alexander Skowalsky from NounProject.com](https://thenounproject.com/icon/astronaut-1784711/)
+- Logo font: [Kalam on google fonts](https://fonts.google.com/specimen/Kalam?query=Kalam)
