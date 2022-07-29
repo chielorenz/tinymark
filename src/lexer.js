@@ -1,44 +1,131 @@
-const regexes = {
-	nl: /[\r\n]+/y,
-	ws: /\s+/y,
-	hash: /#/y,
-	word: /\w+/y,
-};
+// Hand written simple lexer for a subset of the Markdown syntax
 
-export default {
-	// Position of the input to consume next
-	index: 0,
+// Match a whitespace or a tab
+function matchWhiteSpace(string) {
+	const char = string[0];
+	if ("\t ".includes(char)) {
+		return [char, string.substring(1)];
+	}
+	return [null, string];
+}
 
-	// The input string to be consumed
-	input: "",
+// Match a line feed or a carriage return
+function matchLineBreak(string) {
+	const char = string[0];
+	if ("\n\r".includes(char)) {
+		return [char, string.substring(1)];
+	}
+	return [null, string];
+}
 
-	// Whether the input string has been consumed
-	done: false,
+// Match a punctuation mark
+function matchPunctuation(string) {
+	const char = string[0];
+	if (",./?;:'\"[]{}()\\|~!@$%^&*_-+=`".includes(char)) {
+		return [char, string.substring(1)];
+	}
+	return [null, string];
+}
 
-	// Get the next token, like { symbol: 'word', value: 'hello' }
+// Match a digit [0..9]
+function matchDigit(string) {
+	const charCode = string.charCodeAt(0);
+	if (charCode >= 48 && charCode <= 57) {
+		return [string[0], string.substring(1)];
+	}
+	return [null, string];
+}
+
+// Match a character [a..z][A...Z]
+function matchChar(string) {
+	const charCode = string.charCodeAt(0);
+	if (
+		(charCode >= 65 && charCode <= 90) || // A..Z
+		(charCode >= 97 && charCode <= 122) // a..z
+	) {
+		return [string[0], string.substring(1)];
+	}
+	return [null, string];
+}
+
+// Match a hash symbol
+function matchHash(string) {
+	if (string[0] === "#") {
+		return ["#", string.substring(1)];
+	}
+	return [null, string];
+}
+
+// Match text (characters, digits and punctuations)
+function matchText(string) {
+	let char, digit, punc, text, match;
+
+	[digit, string] = matchDigit(string);
+	if (digit) {
+		[text, string] = matchText(string);
+		match = text ? digit + text : digit;
+		return [match, string];
+	}
+
+	[char, string] = matchChar(string);
+	if (char) {
+		[text, string] = matchText(string);
+		match = text ? char + text : char;
+		return [match, string];
+	}
+
+	[punc, string] = matchPunctuation(string);
+	if (punc) {
+		[text, string] = matchText(string);
+		match = text ? punc + text : punc;
+		return [match, string];
+	}
+	return [null, string];
+}
+
+// The input sting
+let input = "";
+
+const lexer = {
+	// Set the input string
+	eat: function (string) {
+		input = string;
+	},
+	// Get wheter all input has been consumed
+	done: function () {
+		return input.length === 0;
+	},
+	// Get the next token, like { symbol: "word", value: "Hello" }
 	next: function () {
-		let token = null;
+		let match = null;
 
-		// Match each regex to the input string on the current index
-		for (const [symbol, regex] of Object.entries(regexes)) {
-			regex.lastIndex = this.index;
-			const res = regex.exec(this.input);
-			if (res) {
-				this.index = regex.lastIndex;
-				token = { symbol, value: res[0] };
-				break;
-			}
+		[match, input] = matchWhiteSpace(input);
+		if (match) {
+			return { symbol: "WS", value: match };
 		}
 
-		// If not match is found but it there is more input to consume throw an error
-		if (!token && this.index != this.input.length) {
-			const string = this.input.slice(this.index);
-			throw new Error(`No match found, but input not empty: "${string}"`);
+		[match, input] = matchLineBreak(input);
+		if (match) {
+			return { symbol: "LB", value: match };
 		}
 
-		// Set done if all input is consumed
-		this.done = this.index == this.input.length;
+		[match, input] = matchHash(input);
+		if (match) {
+			return { symbol: "hash", value: match };
+		}
 
-		return token;
+		[match, input] = matchText(input);
+		if (match) {
+			return { symbol: "text", value: match };
+		}
+
+		throw new Error(`No token found but input not empty: "${input}"`);
 	},
 };
+
+lexer.eat(`# tinymark 
+Hello world!`);
+
+while (!lexer.done()) {
+	console.log(lexer.next());
+}
