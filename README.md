@@ -42,11 +42,11 @@ while (!lexer.done) {
 	console.log(lexer.next());
 }
 
-// { category: 'hash',	lexeme: '#'		}
-// { category: 'WS',	lexeme: ' '		}
-// { category: 'text',	lexeme: 'Hello'	}
-// { category: 'WS',	lexeme: ' '		}
-// { category: 'text',	lexeme: 'Word!'	}
+// { category: 'hash',	lexeme: '#'     }
+// { category: 'WS',	lexeme: ' '     }
+// { category: 'text',	lexeme: 'Hello' }
+// { category: 'WS',	lexeme: ' '     }
+// { category: 'text',	lexeme: 'Word!' }
 ```
 
 <!-- ## 📖 Parser
