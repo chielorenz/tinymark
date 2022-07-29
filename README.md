@@ -1,6 +1,6 @@
 <div align="center"><img src="logo.svg?raw=true"></div>
 
-Proof of concept compiler for a small subset of the Markdown syntax. It is composed by a lexer, a parser and a code generator, it takes a markdown string and convert it into html. 
+Tinymark is a of concept compiler for a small subset of the Markdown syntax. It is composed by a lexer, a parser and a code generator, it takes a markdown string and convert it into html. 
 
 ## 🚀 Getting started
 
