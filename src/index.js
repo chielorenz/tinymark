@@ -1,7 +1,7 @@
-import { readFile } from "fs/promises";
 import lexer from "./lexer.js";
 
-lexer.input = await readFile("input.md", "utf8");
+lexer.eat(`# tinymark 
+Hello world!`);
 
 while (!lexer.done) {
 	console.log(lexer.next());
