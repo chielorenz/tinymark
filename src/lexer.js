@@ -1,13 +1,12 @@
-// Hand written simple lexer for a subset of the Markdown syntax
 class Lexer {
 	#buffer = "";
 
-	// Get the next buffer cahr without removing it
+	// Get the next char without removing it from the buffer
 	#peak() {
 		return Array.from(this.#buffer)[0];
 	}
 
-	// Remove and return the next buffer char
+	// Get the next char from the buffer and remove it
 	#pop() {
 		const peak = this.#peak();
 		this.#buffer = this.#buffer.substring(1);
@@ -15,7 +14,7 @@ class Lexer {
 	}
 
 	// Match the next buffer char against a pattern
-	// The pattern can be both a string or an array
+	// Theattern can be both a string or an array
 	#match(pattern) {
 		const char = this.#peak();
 		if (pattern.includes(char)) {
@@ -75,6 +74,11 @@ class Lexer {
 		}
 	}
 
+	// Return a token with the given category and lexem
+	#token(category, lexeme) {
+		return { category, lexeme };
+	}
+
 	// Get wheter all input has been consumed
 	get done() {
 		return this.#buffer.length === 0;
@@ -91,25 +95,25 @@ class Lexer {
 
 		match = this.#matchWhiteSpace();
 		if (match) {
-			return { symbol: "WS", value: match };
+			return this.#token("WS", match);
 		}
 
 		match = this.#matchLineBreak();
 		if (match) {
-			return { symbol: "LB", value: match };
+			return this.#token("LB", match);
 		}
 
 		match = this.#matchHash();
 		if (match) {
-			return { symbol: "hash", value: match };
+			return this.#token("hash", match);
 		}
 
 		match = this.#matchText();
 		if (match) {
-			return { symbol: "text", value: match };
+			return this.#token("text", match);
 		}
 
-		return { symbol: "other", value: this.#pop() };
+		return this.#token("other", this.#pop());
 	}
 }
 
