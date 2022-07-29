@@ -1,9 +1,7 @@
 {
-	// Autoformat
 	"editor.formatOnSave": true,
 	"editor.formatOnPaste": true,
 
-	// Use tab with size 4
 	"editor.tabSize": 4,
 	"editor.fontSize": 14,
 	"editor.insertSpaces": false,
@@ -11,7 +9,6 @@
 	"prettier.tabWidth": 4,
 	"prettier.useTabs": true,
 
-	// Formatters
 	"[javascript][json]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
