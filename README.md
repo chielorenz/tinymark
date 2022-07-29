@@ -1,37 +1,53 @@
-<div align="center"><img src="logo.svg?raw=true"></div>
+![Tinymark logo](/logo.svg?raw=true)
 
-Tinymark is a of concept compiler for a small subset of the Markdown syntax. It is composed by a lexer, a parser and a code generator, it takes a markdown string and convert it into html. 
+Tinymark is a compiler of a subset of the [markdown](https://spec.commonmark.org/0.30/) syntax. It takes a markdown string and returns html.
 
-## 🚀 Getting started
+# 🔥 Scope
 
-Use docker to setup local environment. Run commands from within the container with the `run` utility, like:
-```bash
-sh ./run [command]
+Tinymark is in very early development and is meant for educational purposes only, not for production.  
+
+<!-- # 🚀 Getting started
+
+todo -->
+
+# <a name="development"></a>👩‍💻 Development
+
+Install dependencies with:
+
+``` bash
+npm install
 ```
 
-Install dependencies:
+Run a script with:
 
-```bash
+``` bash
+node src/index.js
+```
+
+Or watch it with [nodemon](https://www.npmjs.com/package/nodemon):
+
+``` bash
+npm run nodemon src/index.js
+```
+
+## 🐳 Docker
+
+If you use [docker](https://www.docker.com) you can run commands from a node container using the `run` utility:
+
+``` bash
+sh ./run [command]
+
+# For example install dependencies with:
 sh ./run npm install
 ```
 
-Run a script:
+See the [development](#development) section for a list of usefull commands.
 
-```bash
-sh ./run node src/index.js
-```
+# 📚 Lexer
 
-Watch it with [nodemon](https://www.npmjs.com/package/nodemon):
+`lexer.js` is a simple, hand written lexer that recognize the markdown syntax.
 
-```bash
-sh ./run npm run nodemon src/index.js
-```
-
-## 📚 Lexer
-
-Simple hand written lexer that recognize a subset of the markdown syntax.
-
-It takes a markdown string and returns a list of tokens, each token has a category an a lexeme. For example:
+It takes a markdown string and returns a set of tokens, each token has a category an a lexeme. For example:
 
 ``` js
 import lexer from "./src/lexer.js";
@@ -49,15 +65,21 @@ while (!lexer.done) {
 // { category: 'text',	lexeme: 'Word!' }
 ```
 
-<!-- ## 📖 Parser
+<!-- # 📖 Parser
 
 Todo -->
 
-<!-- ## ✍️ Generator
+<!-- # ✍️ Generator
 
 Todo -->
 
----
+<!-- # 🚧 Avaiable syntax
+
+- [x] Paragraphs
+- [x] H1
+- [ ] H2 -->
+
+###### Credits
 
 - Logo inspiration: [Astronaut by Alexander Skowalsky from NounProject.com](https://thenounproject.com/icon/astronaut-1784711/)
 - Logo font: [Kalam on google fonts](https://fonts.google.com/specimen/Kalam?query=Kalam)
