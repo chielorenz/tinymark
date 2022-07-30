@@ -1,10 +1,10 @@
-![Tinymark logo](/logo.svg?raw=true)
+![TinyMark logo](/logo.svg?raw=true)
 
-Tinymark is a compiler of a subset of the [markdown](https://spec.commonmark.org/0.30/) syntax. It takes a markdown string and returns html.
+TinyMark is a compiler of a subset of the [markdown](https://spec.commonmark.org/0.30/) syntax. It takes a markdown string and returns html.
 
 # 🔥 Scope
 
-Tinymark is in very early development and is meant for educational purposes only, not for production.  
+TinyMark is in very early development and is meant for educational purposes only, not for production.  
 
 <!-- # 🚀 Getting started
 
