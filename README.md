@@ -21,14 +21,22 @@ npm install
 Run a script with:
 
 ``` bash
-node src/index.js
+npm run ts-node src/index.ts
 ```
 
 Or watch it with [nodemon](https://www.npmjs.com/package/nodemon):
 
 ``` bash
-npm run nodemon src/index.js
+npm run nodemon src/index.ts
 ```
+
+Compile TypeScript to JavaScript with:
+
+``` bash
+npm run tsc
+```
+
+Generated files are in the `dist` folder.
 
 ## 🐳 Docker
 

@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+	// Target modern ecmascript versions
+	"target": "es6",
+
+	// Enable strict mode
+	// "strict": true,
+
+	// Specify module code generation
+	"module": "es6",
+
+	// Set output directory
+	"outDir": "dist"
+  },
+  "ts-node": {
+	// Enable es module for ts-node
+	"esm": true
+  },
+}
