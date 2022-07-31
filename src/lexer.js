@@ -1,22 +1,26 @@
 class Lexer {
+	// The string to analizy
 	#buffer = "";
 
+	// Current position on the buffer
+	#index = 0;
+
 	// Get the next char without removing it from the buffer
-	#peak() {
-		return Array.from(this.#buffer)[0];
+	#peek() {
+		return Array.from(this.#buffer)[this.#index];
 	}
 
-	// Get the next char from the buffer and remove it
+	// Get the next char from the buffer and move forward the index
 	#pop() {
-		const peak = this.#peak();
-		this.#buffer = this.#buffer.substring(1);
-		return peak;
+		const peek = this.#peek();
+		this.#index++;
+		return peek;
 	}
 
 	// Match the next buffer char against a pattern
 	// Theattern can be both a string or an array
 	#match(pattern) {
-		const char = this.#peak();
+		const char = this.#peek();
 		if (pattern.includes(char)) {
 			return this.#pop();
 		}
@@ -53,24 +57,24 @@ class Lexer {
 		return this.#match(chars);
 	}
 
-	// Match text (characters, digits and punctuations)
-	#matchText() {
+	// Match word (characters, digits and punctuations)
+	#matchWord() {
 		const digit = this.#matchDigit();
 		if (digit) {
-			const text = this.#matchText();
-			return text ? digit + text : digit;
+			const word = this.#matchWord();
+			return word ? digit + word : digit;
 		}
 
 		const char = this.#matchChar();
 		if (char) {
-			const text = this.#matchText();
-			return text ? char + text : char;
+			const word = this.#matchWord();
+			return word ? char + word : char;
 		}
 
 		const punc = this.#matchPunctuation();
 		if (punc) {
-			const text = this.#matchText();
-			return text ? punc + text : punc;
+			const word = this.#matchWord();
+			return word ? punc + word : punc;
 		}
 	}
 
@@ -87,20 +91,21 @@ class Lexer {
 	// Set the input string
 	eat(string) {
 		this.#buffer = string;
+		this.#index = 0;
 	}
 
-	// Get the next token, like { symbol: "word", value: "Hello" }
+	// Get the next token, like { category: "word", lexeme: "Hello" }
 	next() {
 		let match;
 
 		match = this.#matchWhiteSpace();
 		if (match) {
-			return this.#token("WS", match);
+			return this.#token("ws", match);
 		}
 
 		match = this.#matchLineBreak();
 		if (match) {
-			return this.#token("LB", match);
+			return this.#token("lb", match);
 		}
 
 		match = this.#matchHash();
@@ -108,12 +113,20 @@ class Lexer {
 			return this.#token("hash", match);
 		}
 
-		match = this.#matchText();
+		match = this.#matchWord();
 		if (match) {
-			return this.#token("text", match);
+			return this.#token("word", match);
 		}
 
 		return this.#token("other", this.#pop());
+	}
+
+	// Get the next token without moving forward in the buffer
+	peek() {
+		const index = this.#index;
+		const token = this.next();
+		this.#index = index;
+		return token;
 	}
 }
 
