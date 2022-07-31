@@ -84,7 +84,7 @@ class Lexer {
 
 	// Get wheter all input has been consumed
 	get done() {
-		return this.#buffer.length === 0;
+		return this.#index === this.#buffer.length;
 	}
 
 	// Set the input string
