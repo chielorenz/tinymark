@@ -6,21 +6,20 @@ class Lexer {
 	#index = 0;
 
 	// Get the next char without removing it from the buffer
-	#peek() {
+	#look() {
 		return Array.from(this.#buffer)[this.#index];
 	}
 
 	// Get the next char from the buffer and move forward the index
 	#pop() {
-		const peek = this.#peek();
 		this.#index++;
-		return peek;
+		return this.#look();
 	}
 
 	// Match the next buffer char against a pattern
 	// Theattern can be both a string or an array
 	#match(pattern) {
-		const char = this.#peek();
+		const char = this.#look();
 		if (pattern.includes(char)) {
 			return this.#pop();
 		}
