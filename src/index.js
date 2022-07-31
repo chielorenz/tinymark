@@ -1,8 +1,13 @@
 import lexer from "./lexer.js";
+import parser from "./parser.js";
 
-lexer.eat(`# tinymark 
-Hello world!`);
+const md = `# TinyMark
+Compiler`;
 
-while (!lexer.done) {
-	console.log(lexer.next());
-}
+console.log(`DEBUG: matching "${md}"`);
+
+lexer.eat(md);
+parser.use(lexer);
+const ast = parser.parse();
+
+console.log(ast);
