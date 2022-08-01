@@ -67,11 +67,11 @@ while (!lexer.done) {
 }
 
 // Prints:
-{ category: 'hash',	lexeme: '#' }
+{ category: 'hash', lexeme: '#' }
 { category: 'ws', lexeme: ' ' }
-{ category: 'text',	lexeme: 'Hello' }
+{ category: 'text', lexeme: 'Hello' }
 { category: 'ws', lexeme: ' ' }
-{ category: 'text',	lexeme: 'Word!' }
+{ category: 'text', lexeme: 'Word!' }
 ```
 
 # 📖 Parser
