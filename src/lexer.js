@@ -12,8 +12,9 @@ class Lexer {
 
 	// Get the next char from the buffer and move forward the index
 	#pop() {
+		const next = this.#look();
 		this.#index++;
-		return this.#look();
+		return next;
 	}
 
 	// Match the next buffer char against a pattern
@@ -88,7 +89,7 @@ class Lexer {
 	}
 
 	// Set the input string
-	eat(string) {
+	feed(string) {
 		this.#buffer = string;
 		this.#index = 0;
 	}
