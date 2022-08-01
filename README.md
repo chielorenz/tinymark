@@ -2,7 +2,7 @@
 
 TinyMark is a compiler of a tiny subset of the [markdown](https://spec.commonmark.org/0.30/) syntax. It takes a markdown string and returns html.
 
-# 🔥 Scope
+## 🔥 Scope
 
 TinyMark is in very early development and is meant for educational purposes only, not for production.  
 
@@ -10,7 +10,7 @@ TinyMark is in very early development and is meant for educational purposes only
 
 todo -->
 
-# <a name="development"></a>👩‍💻 Development
+## <a name="development"></a>👩‍💻 Development
 
 Install dependencies with:
 
@@ -36,7 +36,7 @@ Enable debug messages by setting the `DEBUG` environment variable:
 DEBUG=true npm run nodemon index.js
 ```
 
-## 🐳 Docker
+### 🐳 Docker
 
 If you use [docker](https://www.docker.com) you can run commands from a node container using the `run` utility:
 
@@ -49,7 +49,7 @@ sh ./run npm install
 
 See the [development](#development) section for a list of usefull commands.
 
-# 📚 Lexer
+## 📚 Lexer
 
 `lexer.js` is a simple, hand written lexer that recognize the markdown syntax.
 
@@ -74,7 +74,7 @@ while (!lexer.done) {
 { category: 'text', lexeme: 'Word!' }
 ```
 
-# 📖 Parser
+## 📖 Parser
 
 `parser.js` is a parser for a tiny subset of the markdown syntax. It'a an hand coded, predictive (no backtracking), recursive descending parser. Given a lexer it returns an abstract syntax tree (AST) that represents the input string.
 
@@ -121,7 +121,7 @@ console.log(ast);
 }
 ```
 
-# ✍️ Coder 
+## ✍️ Coder 
 
 `coder.js` is a simple code generator that takes an AST and returns a string of html.
 
@@ -133,13 +133,14 @@ import coder from "./coder.js";
 lexer.feed("# Hello Word!");
 parser.use(lexer);
 coder.use(parser);
-console.log(coder.make());
+const html = coder.make();
+console.log(html);
 
 // Prints:
 <h1>Hello Word!</h1>
 ```
 
-# 🚧 Avaiable markdown syntax
+## 🚧 Avaiable syntax
 
 Only a tiny subset of the markdown syntax is supported:
 
