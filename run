@@ -1,9 +1,10 @@
 #!/bin/bash
 
 docker run \
-	--rm           `# remove container when done` \
-	-it            `# make it interactive` \
-	-v $(pwd):/src `# bind source folder` \
-	-w /src        `# set workdir` \
-	node:18-alpine `# use node 18` \
-	$@             `# run command`
+	--rm            `# remove container when done` \
+	-it             `# make it interactive` \
+	-v $(pwd):/src  `# bind source folder` \
+	-w /src         `# set workdir` \
+	-e DEBUG=$DEBUG `# enable debug` \
+	node:18-alpine  `# use node 18` \
+	$@              `# run command`
