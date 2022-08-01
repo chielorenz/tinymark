@@ -21,13 +21,19 @@ npm install
 Run a script with:
 
 ``` bash
-node src/index.js
+node index.js
 ```
 
 Or watch it with [nodemon](https://www.npmjs.com/package/nodemon):
 
 ``` bash
-npm run nodemon src/index.js
+npm run nodemon index.js
+```
+
+Enable debug messages by setting the `DEBUG` environment variable:
+
+``` bash
+DEBUG=true npm run nodemon index.js
 ```
 
 ## 🐳 Docker
@@ -50,34 +56,91 @@ See the [development](#development) section for a list of usefull commands.
 It takes a markdown string and returns a set of tokens, each token has a category an a lexeme. For example:
 
 ``` js
-import lexer from "./src/lexer.js";
+import lexer from "./lexer.js";
 
-lexer.eat("# Hello Word!");
+lexer.feed("# Hello Word!");
 
 while (!lexer.done) {
 	console.log(lexer.next());
 }
 
-// { category: 'hash',	lexeme: '#'     }
-// { category: 'WS',	lexeme: ' '     }
-// { category: 'text',	lexeme: 'Hello' }
-// { category: 'WS',	lexeme: ' '     }
-// { category: 'text',	lexeme: 'Word!' }
+// Prints:
+{ category: 'hash',	lexeme: '#'     }
+{ category: 'ws',	lexeme: ' '     }
+{ category: 'text',	lexeme: 'Hello' }
+{ category: 'ws',	lexeme: ' '     }
+{ category: 'text',	lexeme: 'Word!' }
 ```
 
-<!-- # 📖 Parser
+# 📖 Parser
 
-Todo -->
+`parser.js` is a parser for a tiny subset of the markdown syntax. It'a an hand coded, predictive (no backtracking), recursive descending parser. Given a lexer it returns an abstract syntax tree (AST) that represents the input string.
 
-<!-- # ✍️ Generator
+``` js
+import lexer from "./lexer.js";
+import parser from "./parser.js";
 
-Todo -->
+lexer.feed("# Hello Word!");
+parser.use(lexer);
+const ast = parser.parse();
+console.log(parser.parse());
 
-<!-- # 🚧 Avaiable syntax
+// Prints:
+{
+  type: 'main',
+  value: [
+    {
+      type: 'row',
+      value: [
+        {
+          type: 'content',
+          value: [
+            {
+              type: 'h1',
+              value: [
+                { type: 'hash', value: '#' },
+                {
+                  type: 'text',
+                  value: [
+                    { type: 'word', value: 'Hello' },
+                    {
+                      type: 'text',
+                      value: [ { type: 'word', value: 'Word!' } ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
 
-- [x] Paragraphs
-- [x] H1
-- [ ] H2 -->
+# ✍️ Coder 
+
+`coder.js` is a simple code generator that takes an AST and returns a string of html.
+
+``` js
+import lexer from "./lexer.js";
+import parser from "./parser.js";
+import coder from "./coder.js";
+
+lexer.feed("# Hello Word!");
+parser.use(lexer);
+coder.use(parser);
+console.log(coder.make());
+
+// Prints:
+<h1>Hello Word!</h1>
+```
+
+# 🚧 Avaiable syntax
+
+- H1
+- Paragraph
 
 ###### Credits
 
