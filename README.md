@@ -1,6 +1,6 @@
 ![TinyMark logo](/logo.svg?raw=true)
 
-TinyMark is a compiler of a subset of the [markdown](https://spec.commonmark.org/0.30/) syntax. It takes a markdown string and returns html.
+TinyMark is a compiler of a tiny subset of the [markdown](https://spec.commonmark.org/0.30/) syntax. It takes a markdown string and returns html.
 
 # 🔥 Scope
 
@@ -60,15 +60,17 @@ import lexer from "./lexer.js";
 
 lexer.feed("# Hello Word!");
 
+let token;
 while (!lexer.done) {
-	console.log(lexer.next());
+	token = lexer.next();
+	console.log(token);
 }
 
 // Prints:
-{ category: 'hash',	lexeme: '#'     }
-{ category: 'ws',	lexeme: ' '     }
+{ category: 'hash',	lexeme: '#' }
+{ category: 'ws', lexeme: ' ' }
 { category: 'text',	lexeme: 'Hello' }
-{ category: 'ws',	lexeme: ' '     }
+{ category: 'ws', lexeme: ' ' }
 { category: 'text',	lexeme: 'Word!' }
 ```
 
@@ -83,7 +85,7 @@ import parser from "./parser.js";
 lexer.feed("# Hello Word!");
 parser.use(lexer);
 const ast = parser.parse();
-console.log(parser.parse());
+console.log(ast);
 
 // Prints:
 {
@@ -137,7 +139,9 @@ console.log(coder.make());
 <h1>Hello Word!</h1>
 ```
 
-# 🚧 Avaiable syntax
+# 🚧 Avaiable markdown syntax
+
+Only a tiny subset of the markdown syntax is supported:
 
 - H1
 - Paragraph
