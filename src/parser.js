@@ -21,21 +21,24 @@
 //
 // text -> %word %ws:? text
 //     | %word
+//
+// AST node:
+// {
+//   type: "h1"|"p",
+//   value: [nodes]
+// }
 
-const debug = true;
-const log = (...msg) => {
-	if (debug) console.log("DEBUG:", ...msg);
-};
+import { log } from "./utils.js";
 
 class Parser {
 	#lexer = null;
 
 	#match(type) {
-		log(`match(${type})`);
+		log(`Match ${type}`);
 
 		if (this.#lexer.peek().category === type) {
 			log("✅Found:", `"${this.#lexer.peek().lexeme}"`);
-			return [this.#lexer.next()];
+			return { type, value: this.#lexer.next().lexeme };
 		}
 	}
 
@@ -56,86 +59,86 @@ class Parser {
 	}
 
 	#matchText() {
-		log("matchText");
+		log("Match Text");
 
 		const word = this.#matchWord();
 		if (word) {
 			this.#matchWhiteSpace();
 			const text = this.#matchText();
 			if (text) {
-				return [...word, ...text];
+				return { type: "text", value: [word, text] };
 			} else {
-				return [...word];
+				return { type: "text", value: [word] };
 			}
 		}
 	}
 
 	#matchH1() {
-		log("matchH1");
+		log("match H1");
 
 		const hash = this.#matchHash();
 		this.#matchWhiteSpace();
 		const text = this.#matchText();
 		if (text) {
-			return [...hash, ...text];
+			return { type: "h1", value: [hash, text] };
 		} else {
 			if (hash) {
-				return [...hash];
+				return { type: "h1", value: [hash] };
 			}
 		}
 	}
 
 	#matchP() {
-		log("matchP");
+		log("Match P");
 
 		const text = this.#matchText();
 		if (text) {
-			return [...text];
+			return { type: "p", value: [text] };
 		}
 	}
 
 	#matchContent() {
-		log("matchContent");
+		log("Match Content");
 
 		const p = this.#matchP();
 		if (p) {
-			return [...p];
+			return { type: "content", value: [p] };
 		} else {
 			const h1 = this.#matchH1();
 			if (h1) {
-				return [...h1];
+				return { type: "content", value: [h1] };
 			}
 		}
 	}
 
 	#matchRow() {
-		log("matchRow");
+		log("Match Row");
 
 		this.#matchWhiteSpace();
 		const content = this.#matchContent();
 		if (content) {
 			this.#matchWhiteSpace();
-			return [...content];
+			return { type: "row", value: [content] };
 		} else {
-			return [];
+			return { type: "row", value: [] };
 		}
 	}
 
 	#matchMain() {
-		log("matchMain");
+		log("Match Main");
 
 		const row = this.#matchRow();
 		if (row) {
 			const nl = this.#matchNewLine();
 			if (nl) {
 				const main = this.#matchMain();
-				return [...row, ...main];
+				return { type: "main", value: [row, main] };
 			} else {
-				return [...row];
+				return { type: "main", value: [row] };
 			}
 		}
 
-		return [];
+		return { type: "main", value: [] };
 	}
 
 	// Set the lexer
@@ -145,8 +148,7 @@ class Parser {
 
 	// Get the AST of the parsed input
 	parse() {
-		log("parse");
-
+		log("Parsing...");
 		return this.#matchMain();
 	}
 }
