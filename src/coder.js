@@ -34,7 +34,7 @@ class Coder {
 
 	make() {
 		const ast = this.#parser.parse();
-		console.dir(ast, { depth: null });
+		// console.dir(ast, { depth: null });
 
 		log("Making...");
 		return this.#generate([ast]);
