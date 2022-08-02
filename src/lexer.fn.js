@@ -1,24 +1,15 @@
-// function done(buff, index) {
-// 	return index >= buff.length;
-// }
-
-// function peek(buff, index) {
-// 	const [token, _, value] = next(buff, index);
-// 	return [token, index, value];
-// }
-
-function match(patters, buff, index) {
+function match(patter, buff, index) {
 	const char = buff[index];
 
-	if (patters.includes(char)) {
+	if (patter.includes(char)) {
 		return [char, index + 1];
 	}
 
-	return [null, index];
+	return ["", index];
 }
 
 function matchWhiteSpace(buff, index) {
-	return match(["\t", " "], buff, index);
+	return match("\t ", buff, index);
 }
 
 function matchLineBreak(buff, index) {
@@ -46,22 +37,36 @@ function matchWord(buff, index) {
 	const [digit, digitIndex] = matchDigit(buff, index);
 	if (digit) {
 		const [word, wordIndex] = matchWord(buff, digitIndex);
-		return word ? [digit + word, wordIndex] : [digit, digitIndex];
+		return [digit.concat(word), wordIndex];
 	}
 
 	const [char, charIndex] = matchChar(buff, index);
 	if (char) {
 		const [word, wordIndex] = matchWord(buff, charIndex);
-		return word ? [char + word, wordIndex] : [char, charIndex];
+		return [char.concat(word), wordIndex];
 	}
 
 	const [punc, puncIndex] = matchPunctuation(buff, index);
 	if (punc) {
 		const [word, wordIndex] = matchWord(buff, puncIndex);
-		return word ? [punc + word, wordIndex] : [punc, puncIndex];
+		return [punc.concat(word), wordIndex];
 	}
 
-	return [null, index];
+	return ["", index];
+}
+
+/**
+ * @param {string} type Token type
+ * @param {string} value Token value
+ * @param {string} buff The buffer
+ * @param {integer} index The index
+ */
+function token(type, value, buff, index) {
+	return {
+		lex: { type, value },
+		next: (peek) => next(buff, index, peek),
+		done: index >= buff.length,
+	};
 }
 
 function next(buff, index, peek = false) {
@@ -82,20 +87,6 @@ function next(buff, index, peek = false) {
 
 function feed(buff) {
 	return token(null, null, buff, 0);
-}
-
-/**
- * @param {string} type Token type
- * @param {string} value Token value
- * @param {string} buff The buffer
- * @param {integer} index The index
- */
-function token(type, value, buff, index) {
-	return {
-		lex: { type, value },
-		next: (peek) => next(buff, index, peek),
-		done: index >= buff.length,
-	};
 }
 
 export { feed };
