@@ -4,7 +4,7 @@
 	"target": "es6",
 
 	// Enable strict mode
-	// "strict": true,
+	"strict": true,
 
 	// Specify module code generation
 	"module": "es6",
