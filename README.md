@@ -1,8 +1,8 @@
 ![TinyMark logo](/logo.svg?raw=true)
 
-TinyMark is a compiler of a subset of the [markdown](https://spec.commonmark.org/0.30/) syntax. It takes a markdown string and returns html.
+TinyMark is a compiler of a tiny subset of the [markdown](https://spec.commonmark.org/0.30/) syntax. It takes a markdown string and returns html.
 
-# 🔥 Scope
+## 🔥 Scope
 
 TinyMark is in very early development and is meant for educational purposes only, not for production.  
 
@@ -10,7 +10,7 @@ TinyMark is in very early development and is meant for educational purposes only
 
 todo -->
 
-# <a name="development"></a>👩‍💻 Development
+## <a name="development"></a>👩‍💻 Development
 
 Install dependencies with:
 
@@ -21,13 +21,19 @@ npm install
 Run a script with:
 
 ``` bash
-npm run ts-node src/index.ts
+npm run ts-node index.ts
 ```
 
 Or watch it with [nodemon](https://www.npmjs.com/package/nodemon):
 
 ``` bash
-npm run nodemon src/index.ts
+npm run nodemon index.ts
+```
+
+Enable debug messages by setting the `DEBUG` environment variable:
+
+``` bash
+DEBUG=true npm run nodemon index.ts
 ```
 
 Compile TypeScript to JavaScript with:
@@ -51,41 +57,103 @@ sh ./run npm install
 
 See the [development](#development) section for a list of usefull commands.
 
-# 📚 Lexer
+## 📚 Lexer
 
 `lexer.js` is a simple, hand written lexer that recognize the markdown syntax.
 
 It takes a markdown string and returns a set of tokens, each token has a category an a lexeme. For example:
 
 ``` js
-import lexer from "./src/lexer.js";
+import lexer from "./lexer.js";
 
-lexer.eat("# Hello Word!");
+lexer.feed("# Hello Word!");
 
+let token;
 while (!lexer.done) {
-	console.log(lexer.next());
+	token = lexer.next();
+	console.log(token);
 }
 
-// { category: 'hash',	lexeme: '#'     }
-// { category: 'WS',	lexeme: ' '     }
-// { category: 'text',	lexeme: 'Hello' }
-// { category: 'WS',	lexeme: ' '     }
-// { category: 'text',	lexeme: 'Word!' }
+// Prints:
+{ category: 'hash', lexeme: '#' }
+{ category: 'ws', lexeme: ' ' }
+{ category: 'text', lexeme: 'Hello' }
+{ category: 'ws', lexeme: ' ' }
+{ category: 'text', lexeme: 'Word!' }
 ```
 
-<!-- # 📖 Parser
+## 📖 Parser
 
-Todo -->
+`parser.js` is a parser for a tiny subset of the markdown syntax. It'a an hand coded, predictive (no backtracking), recursive descending parser. Given a lexer it returns an abstract syntax tree (AST) that represents the input string.
 
-<!-- # ✍️ Generator
+``` js
+import lexer from "./lexer.js";
+import parser from "./parser.js";
 
-Todo -->
+lexer.feed("# Hello Word!");
+parser.use(lexer);
+const ast = parser.parse();
+console.log(ast);
 
-<!-- # 🚧 Avaiable syntax
+// Prints:
+{
+  type: 'main',
+  value: [
+    {
+      type: 'row',
+      value: [
+        {
+          type: 'content',
+          value: [
+            {
+              type: 'h1',
+              value: [
+                { type: 'hash', value: '#' },
+                {
+                  type: 'text',
+                  value: [
+                    { type: 'word', value: 'Hello' },
+                    {
+                      type: 'text',
+                      value: [ { type: 'word', value: 'Word!' } ]
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
 
-- [x] Paragraphs
-- [x] H1
-- [ ] H2 -->
+## ✍️ Coder 
+
+`coder.js` is a simple code generator that takes an AST and returns a string of html.
+
+``` js
+import lexer from "./lexer.js";
+import parser from "./parser.js";
+import coder from "./coder.js";
+
+lexer.feed("# Hello Word!");
+parser.use(lexer);
+coder.use(parser);
+const html = coder.make();
+console.log(html);
+
+// Prints:
+<h1>Hello Word!</h1>
+```
+
+## 🚧 Avaiable syntax
+
+Only a tiny subset of the markdown syntax is supported:
+
+- H1
+- Paragraph
 
 ###### Credits
 
