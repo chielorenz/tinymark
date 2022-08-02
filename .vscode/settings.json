@@ -9,7 +9,7 @@
 	"prettier.tabWidth": 4,
 	"prettier.useTabs": true,
 
-	"[javascript][json]": {
+	"[javascript][typescript][json]": {
 		"editor.defaultFormatter": "esbenp.prettier-vscode"
 	},
 	"[markdown]": {
