@@ -63,10 +63,10 @@ class Parser {
 
 		const word = this.#matchWord();
 		if (word) {
-			this.#matchWhiteSpace();
+			const ws = this.#matchWhiteSpace();
 			const text = this.#matchText();
 			if (text) {
-				return { type: "text", value: [word, text] };
+				return { type: "text", value: [word, ws, text] };
 			} else {
 				return { type: "text", value: [word] };
 			}
@@ -80,10 +80,10 @@ class Parser {
 		this.#matchWhiteSpace();
 		const text = this.#matchText();
 		if (text) {
-			return { type: "h1", value: [hash, text] };
+			return { type: "h1", value: [text] };
 		} else {
 			if (hash) {
-				return { type: "h1", value: [hash] };
+				return { type: "h1", value: "" };
 			}
 		}
 	}
@@ -132,7 +132,7 @@ class Parser {
 			const nl = this.#matchNewLine();
 			if (nl) {
 				const main = this.#matchMain();
-				return { type: "main", value: [row, main] };
+				return { type: "main", value: [row, nl, main] };
 			} else {
 				return { type: "main", value: [row] };
 			}
