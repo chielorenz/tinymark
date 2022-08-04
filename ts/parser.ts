@@ -39,7 +39,7 @@ export interface Ast {
 function match(type: string, lexer: Lexer): [Ast | null, Lexer] {
 	log(`Matching ${type}`);
 
-	const peek = lexer.next(true);
+	const peek = lexer.peek();
 	if (peek.token.type === type) {
 		const next = lexer.next();
 		log("✅Found:", `"${next.token.value}"`);
@@ -173,10 +173,8 @@ function parse(lexer: Lexer): Ast | null {
 	return mainAst;
 }
 
-function useParser(lexer: Lexer) {
-	return function () {
-		return parse(lexer);
-	};
-}
+const useParser = (lexer: Lexer) => ({
+	parse: () => parse(lexer),
+});
 
-export { useParser };
+export default useParser;

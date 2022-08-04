@@ -30,8 +30,8 @@ function generate(nodes: Ast[]): string {
 	return html;
 }
 
-function make(parse: any) {
-	const ast = parse();
+function make(parser: any) {
+	const ast = parser.parse();
 
 	log("Making...");
 	return generate([ast]);

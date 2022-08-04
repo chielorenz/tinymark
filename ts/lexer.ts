@@ -1,100 +1,126 @@
 export interface Lexer {
-	token: { type: string; value: string };
-	next: (peek?: boolean) => Lexer;
+	token: Token;
+	next: () => Lexer;
+	peek: () => Lexer;
 	done: boolean;
 }
 
-function token(type: string, value: string, buff: string, index: number) {
-	return {
-		token: { type, value },
-		next: (peek = false) => next(buff, index, peek),
-		done: index >= buff.length,
-	};
+export interface Buffer {
+	raw: string;
+	current: string;
+	next: () => Buffer;
+	done: boolean;
 }
 
-function match(patter: string, buff: string, index: number): [string, number] {
-	const char = buff[index];
+export interface Token {
+	type: string;
+	value: string;
+}
 
-	if (patter.includes(char)) {
-		return [char, index + 1];
+export interface Match {
+	value: string;
+	buff: Buffer;
+}
+
+const MARKS = ",./?;:'\"[]{}()\\|~!@$%^&*_-+=`";
+const CHARS = "abcdefghijklmnopqrstuvwxzyABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+const DIGITS = "0123456789";
+const WS = "\t ";
+const LB = "\n\r";
+const HASH = "#";
+
+const createToken = (type: string = "", value: string = ""): Token => ({
+	type,
+	value,
+});
+
+const createBuffer = (raw: string = ""): Buffer => ({
+	raw,
+	current: raw.slice(0, 1),
+	next: () => createBuffer(raw.slice(1)),
+	done: raw.length === 0,
+});
+
+const createLexer = (token: Token, buff: Buffer): Lexer => ({
+	token,
+	next: () => nextToken(buff),
+	peek: () => nextToken(buff, true),
+	done: buff.done,
+});
+
+const createMatch = (value: string, buff: Buffer): Match => ({ value, buff });
+
+const matchPattern = (patter: string, buff: Buffer): Match => {
+	const char = buff.current;
+	return patter.includes(char)
+		? createMatch(char, buff.next())
+		: createMatch("", buff);
+};
+
+const matchWhiteSpace = (buff: Buffer) => matchPattern(WS, buff);
+const matchLineBreak = (buff: Buffer) => matchPattern(LB, buff);
+const matchHash = (buff: Buffer) => matchPattern(HASH, buff);
+const matchDigit = (buff: Buffer) => matchPattern(DIGITS, buff);
+const matchChar = (buff: Buffer) => matchPattern(CHARS, buff);
+const matchMarks = (buff: Buffer) => matchPattern(MARKS, buff);
+
+const matchWord = (buff: Buffer): Match => {
+	const digit = matchDigit(buff);
+	if (digit.value) {
+		const wordMatch = matchWord(digit.buff);
+		const wordValue = digit.value.concat(wordMatch.value);
+		return createMatch(wordValue, wordMatch.buff);
 	}
 
-	return ["", index];
-}
-
-function matchWhiteSpace(buff: string, index: number): [string, number] {
-	return match("\t ", buff, index);
-}
-
-function matchLineBreak(buff: string, index: number): [string, number] {
-	return match("\n\r", buff, index);
-}
-
-function matchHash(buff: string, index: number): [string, number] {
-	return match("#", buff, index);
-}
-
-function matchDigit(buff: string, index: number): [string, number] {
-	return match("0123456789", buff, index);
-}
-
-function matchChar(buff: string, index: number): [string, number] {
-	const chars = "abcdefghijklmnopqrstuvwxzyABCDEFGHIJKLMNOPQRSTUVWXYZ";
-	return match(chars, buff, index);
-}
-
-function matchPunctuation(buff: string, index: number): [string, number] {
-	return match(",./?;:'\"[]{}()\\|~!@$%^&*_-+=`", buff, index);
-}
-
-function matchWord(buff: string, index: number): [string, number] {
-	const [digit, digitIndex] = matchDigit(buff, index);
-	if (digit) {
-		const [word, wordIndex] = matchWord(buff, digitIndex);
-		return [digit.concat(word), wordIndex];
+	const char = matchChar(buff);
+	if (char.value) {
+		const wordMatch = matchWord(char.buff);
+		const charValue = char.value.concat(wordMatch.value);
+		return createMatch(charValue, wordMatch.buff);
 	}
 
-	const [char, charIndex] = matchChar(buff, index);
-	if (char) {
-		const [word, wordIndex] = matchWord(buff, charIndex);
-		return [char.concat(word), wordIndex];
+	const mark = matchMarks(buff);
+	if (mark.value) {
+		const wordMatch = matchWord(mark.buff);
+		const puncValue = mark.value.concat(wordMatch.value);
+		return createMatch(puncValue, wordMatch.buff);
 	}
 
-	const [punc, puncIndex] = matchPunctuation(buff, index);
-	if (punc) {
-		const [word, wordIndex] = matchWord(buff, puncIndex);
-		return [punc.concat(word), wordIndex];
+	return createMatch("", buff);
+};
+
+function nextToken(buff: Buffer, peek: boolean = false) {
+	const ws = matchWhiteSpace(buff);
+	if (ws.value) {
+		const wsBuff = peek ? buff : ws.buff;
+		return createLexer(createToken("ws", ws.value), wsBuff);
 	}
 
-	return ["", index];
+	const lb = matchLineBreak(buff);
+	if (lb.value) {
+		const lbBuff = peek ? buff : lb.buff;
+		return createLexer(createToken("lb", lb.value), lbBuff);
+	}
+
+	const hash = matchHash(buff);
+	if (hash.value) {
+		const hashBuff = peek ? buff : hash.buff;
+		return createLexer(createToken("hash", hash.value), hashBuff);
+	}
+
+	const word = matchWord(buff);
+	if (word.value) {
+		const wordBuff = peek ? buff : word.buff;
+		return createLexer(createToken("word", word.value), wordBuff);
+	}
+
+	return createLexer(
+		createToken("other", buff.current),
+		peek ? buff : buff.next()
+	);
 }
 
-function next(buff: string, index: number, peek: boolean = false) {
-	const [ws, wsIndex] = matchWhiteSpace(buff, index);
-	if (ws) {
-		return token("ws", ws, buff, peek ? index : wsIndex);
-	}
+const useLexer = (value: string) =>
+	createLexer(createToken(), createBuffer(value));
 
-	const [lb, lbIndex] = matchLineBreak(buff, index);
-	if (lb) {
-		return token("lb", lb, buff, peek ? index : lbIndex);
-	}
-
-	const [hash, hashIndex] = matchHash(buff, index);
-	if (hash) {
-		return token("hash", hash, buff, peek ? index : hashIndex);
-	}
-
-	const [word, wordIndex] = matchWord(buff, index);
-	if (word) {
-		return token("word", word, buff, peek ? index : wordIndex);
-	}
-
-	return token("other", buff[index] ?? null, buff, peek ? index : index + 1);
-}
-
-function feed(buff: string) {
-	return token("", "", buff, 0);
-}
-
-export { feed };
+export default useLexer;
