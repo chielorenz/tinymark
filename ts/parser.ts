@@ -1,4 +1,4 @@
-// Parser for a tiny subset of the markdown syntax. It'a an hand coded,
+// Parser for a tiny subset of the markdown syntax. It's an hand coded,
 // predictive (no backtracking), recursive descending parser.
 //
 // BNF(-ish) notation
@@ -29,44 +29,38 @@
 // }
 
 import { Lexer } from "./lexer";
-import { log, logDeep } from "./utils.js";
+import { useLog, useLogDeep } from "./utils.js";
+const log = useLog("Parser |");
+const logDeep = useLogDeep("Parser |");
 
 export interface Ast {
 	type: string;
 	value: Ast[] | string;
 }
 
-function match(type: string, lexer: Lexer): [Ast | null, Lexer] {
-	log(`Matching ${type}`);
+const match = (type: string, lexer: Lexer): [Ast | null, Lexer] => {
+	log(`Match "${type}" on`, lexer.token);
 
 	const peek = lexer.peek();
 	if (peek.token.type === type) {
 		const next = lexer.next();
-		log("✅Found:", `"${next.token.value}"`);
+		log("Found", `"${next.token.value}" ✅`);
 		return [next.token, next];
 	}
 
 	return [null, lexer];
-}
+};
 
-function matchWhiteSpace(lexer: Lexer) {
-	return match("ws", lexer);
-}
+const matchWhiteSpace = (lexer: Lexer) => match("ws", lexer);
 
-function matchLineBreak(lexer: Lexer) {
-	return match("lb", lexer);
-}
+const matchLineBreak = (lexer: Lexer) => match("lb", lexer);
 
-function matchHash(lexer: Lexer) {
-	return match("hash", lexer);
-}
+const matchHash = (lexer: Lexer) => match("hash", lexer);
 
-function matchWord(lexer: Lexer) {
-	return match("word", lexer);
-}
+const matchWord = (lexer: Lexer) => match("word", lexer);
 
-function matchText(lexer: Lexer): [Ast | null, Lexer] {
-	log("Matching text");
+const matchText = (lexer: Lexer): [Ast | null, Lexer] => {
+	log(`Match "text" on`, lexer.token);
 
 	const [wordAst, wordLexer] = matchWord(lexer);
 	if (wordAst) {
@@ -85,10 +79,10 @@ function matchText(lexer: Lexer): [Ast | null, Lexer] {
 	}
 
 	return [null, lexer];
-}
+};
 
-function matchP(lexer: Lexer): [Ast | null, Lexer] {
-	log("Matching p");
+const matchP = (lexer: Lexer): [Ast | null, Lexer] => {
+	log(`Match "p" on`, lexer.token);
 
 	const [textAst, textLexer] = matchText(lexer);
 	if (textAst) {
@@ -96,10 +90,10 @@ function matchP(lexer: Lexer): [Ast | null, Lexer] {
 	}
 
 	return [null, lexer];
-}
+};
 
-function matchH1(lexer: Lexer): [Ast | null, Lexer] {
-	log("Matching h1");
+const matchH1 = (lexer: Lexer): [Ast | null, Lexer] => {
+	log(`Match "h1" on`, lexer.token);
 
 	const [hashAst, hashLexer] = matchHash(lexer);
 	const [_, hashWs] = matchWhiteSpace(hashLexer);
@@ -113,10 +107,10 @@ function matchH1(lexer: Lexer): [Ast | null, Lexer] {
 	}
 
 	return [null, lexer];
-}
+};
 
-function matchContent(lexer: Lexer): [Ast | null, Lexer] {
-	log("Matching content");
+const matchContent = (lexer: Lexer): [Ast | null, Lexer] => {
+	log(`Match "content" on`, lexer.token);
 
 	const [pAst, pLexer] = matchP(lexer);
 	if (pAst) {
@@ -129,10 +123,10 @@ function matchContent(lexer: Lexer): [Ast | null, Lexer] {
 	}
 
 	return [null, lexer];
-}
+};
 
-function matchRow(lexer: Lexer): [Ast | null, Lexer] {
-	log("Matching row");
+const matchRow = (lexer: Lexer): [Ast | null, Lexer] => {
+	log(`Match "row" on`, lexer.token);
 
 	const [_, wsLexer] = matchWhiteSpace(lexer);
 	const [contentAst, contentLexer] = matchContent(wsLexer);
@@ -142,10 +136,10 @@ function matchRow(lexer: Lexer): [Ast | null, Lexer] {
 	}
 
 	return [null, lexer];
-}
+};
 
-function matchMain(lexer: Lexer): [Ast | null, Lexer] {
-	log("Matching main");
+const matchMain = (lexer: Lexer): [Ast | null, Lexer] => {
+	log(`Match "main" on`, lexer.token);
 
 	const [rowAst, rowLexer] = matchRow(lexer);
 	if (rowAst) {
@@ -164,14 +158,13 @@ function matchMain(lexer: Lexer): [Ast | null, Lexer] {
 	}
 
 	return [null, lexer];
-}
+};
 
-function parse(lexer: Lexer): Ast | null {
-	log("Perser:");
+const parse = (lexer: Lexer): Ast | null => {
 	const [mainAst] = matchMain(lexer);
-	logDeep(mainAst, "AST:");
+	logDeep(mainAst, "AST");
 	return mainAst;
-}
+};
 
 const useParser = (lexer: Lexer) => ({
 	parse: () => parse(lexer),
