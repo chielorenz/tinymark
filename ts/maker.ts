@@ -1,5 +1,6 @@
 import { Ast } from "./parser.js";
-import { log } from "./utils.js";
+import { useLog } from "./utils.js";
+const log = useLog("Maker |");
 
 function generate(nodes: Ast[]): string {
 	let html = "";

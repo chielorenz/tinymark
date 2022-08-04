@@ -1,3 +1,6 @@
+import { useLog } from "./utils.js";
+const log = useLog("Lexer |");
+
 export interface Lexer {
 	token: Token;
 	next: () => Lexer;
@@ -51,6 +54,8 @@ const createLexer = (token: Token, buff: Buffer): Lexer => ({
 const createMatch = (value: string, buff: Buffer): Match => ({ value, buff });
 
 const matchPattern = (patter: string, buff: Buffer): Match => {
+	log(`Match pattern "${patter}" on "${buff.current}"`);
+
 	const char = buff.current;
 	return patter.includes(char)
 		? createMatch(char, buff.next())
@@ -90,6 +95,8 @@ const matchWord = (buff: Buffer): Match => {
 };
 
 function nextToken(buff: Buffer, peek: boolean = false) {
+	log(`Get next token on "${buff.current}" (peek = ${peek})`);
+
 	const ws = matchWhiteSpace(buff);
 	if (ws.value) {
 		const wsBuff = peek ? buff : ws.buff;
