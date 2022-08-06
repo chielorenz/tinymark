@@ -31,51 +31,48 @@ const buffer = (value = "", match = ""): Buffer => ({
 	done: value.length === 0,
 });
 
-const lexer = (token: Token, buff: Buffer): Lexer => ({
+const lexer = (token: Token, buf: Buffer): Lexer => ({
 	token: token,
-	next: () => next(buff),
-	peek: () => next(buff, true),
-	done: buff.done,
+	next: () => next(buf),
+	peek: () => next(buf, true),
+	done: buf.done,
 });
 
-const is = (regex: RegExp, buff: Buffer) => regex.test(buff.value);
-const isDigit = (buff: Buffer) => is(/\d/, buff);
-const isChar = (buff: Buffer) => is(/[a-zA-Z]/, buff);
-const isWS = (buff: Buffer) => is(/[^\S\r\n]/, buff);
-const isMarks = (buff: Buffer) => is(/[^a-zA-Z0-9\s]/, buff);
-const isLB = (buff: Buffer) => is(/[\n\r]/, buff);
-const isHash = (buff: Buffer) => is(/#/, buff);
+const is = (regex: RegExp, buf: Buffer) => regex.test(buf.value);
+const isDigit = (buf: Buffer) => is(/\d/, buf);
+const isChar = (buf: Buffer) => is(/[a-zA-Z]/, buf);
+const isWS = (buf: Buffer) => is(/[^\S\r\n]/, buf);
+const isMarks = (buf: Buffer) => is(/[^a-zA-Z0-9\s]/, buf);
+const isLB = (buf: Buffer) => is(/[\n\r]/, buf);
+const isHash = (buf: Buffer) => is(/#/, buf);
+const isWord = (buf: Buffer) => isChar(buf) || isDigit(buf) || isMarks(buf);
 
-const matchWS = (buff: Buffer) => (isWS(buff) ? buff.next() : buff);
-const matchLB = (buff: Buffer) => (isLB(buff) ? buff.next() : buff);
-const matchHash = (buff: Buffer) => (isHash(buff) ? buff.next() : buff);
-const matchWord = (buff: Buffer): Buffer =>
-	isChar(buff) || isDigit(buff) || isMarks(buff)
-		? matchWord(buff.next())
-		: buff;
+const matchWS = (buf: Buffer): Buffer =>
+	isWS(buf) ? matchWS(buf.next()) : buf;
 
-function next(buff: Buffer, peek: boolean = false): Lexer {
-	const ws = matchWS(buff);
-	if (ws.match) {
-		return lexer(token("ws", ws.match), peek ? buff : ws.reset());
+const matchWord = (buf: Buffer): Buffer =>
+	isWord(buf) ? matchWord(buf.next()) : buf;
+
+function next(buf: Buffer, peek: boolean = false): Lexer {
+	if (isWS(buf)) {
+		const ws = matchWS(buf.next());
+		return lexer(token("ws", ws.match), peek ? buf : ws.reset());
 	}
 
-	const lb = matchLB(buff);
-	if (lb.match) {
-		return lexer(token("lb", lb.match), peek ? buff : lb.reset());
+	if (isLB(buf)) {
+		return lexer(token("lb", buf.value), peek ? buf : buf.reset().next());
 	}
 
-	const hash = matchHash(buff);
-	if (hash.match) {
-		return lexer(token("hash", hash.match), peek ? buff : hash.reset());
+	if (isHash(buf)) {
+		return lexer(token("hash", buf.value), peek ? buf : buf.reset().next());
 	}
 
-	const word = matchWord(buff);
-	if (word.match) {
-		return lexer(token("word", word.match), peek ? buff : word.reset());
+	if (isWord(buf)) {
+		const word = matchWord(buf.next());
+		return lexer(token("word", word.match), peek ? buf : word.reset());
 	}
 
-	return lexer(token("other", buff.value), peek ? buff : buff.next().reset());
+	return lexer(token("other", buf.value), peek ? buf : buf.reset());
 }
 
 const useLexer = (string: string): Lexer => lexer(token(), buffer(string));
