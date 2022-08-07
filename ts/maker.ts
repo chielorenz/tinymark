@@ -1,31 +1,26 @@
-import { Ast } from "./parser.js";
-import { useLog } from "./utils.js";
-const log = useLog("Maker |");
+import { Node } from "./parser-easy.js";
 
-function generate(nodes: Ast[]): string {
+function generate(node: Node): string {
 	let html = "";
 
-	for (const node of nodes) {
-		log(`Make ${node.type}`);
-
-		switch (node.type) {
-			case "h1":
-				if (Array.isArray(node.value)) {
-					html += `<h1>${generate(node.value)}</h1>`;
-				}
-				break;
-			case "p":
-				if (Array.isArray(node.value)) {
-					html += `<p>${generate(node.value)}</p>`;
-				}
-				break;
-			default:
-				if (Array.isArray(node.value)) {
-					html += generate(node.value);
-				} else {
-					html += node.value;
-				}
-		}
+	switch (node.type) {
+		case "h1":
+			for (const value of node.value) {
+				const elem = typeof value == "string" ? value : generate(value);
+				html += `<h1>${elem}</h1>`;
+			}
+			break;
+		case "p":
+			for (const value of node.value) {
+				const elem = typeof value == "string" ? value : generate(value);
+				html += `<p>${elem}</p>`;
+			}
+			break;
+		default:
+			for (const value of node.value) {
+				const elem = typeof value == "string" ? value : generate(value);
+				html += elem;
+			}
 	}
 
 	return html;
@@ -33,9 +28,7 @@ function generate(nodes: Ast[]): string {
 
 function make(parser: any) {
 	const ast = parser.parse();
-
-	log("Making...");
-	return generate([ast]);
+	return generate(ast);
 }
 
 export { make };
