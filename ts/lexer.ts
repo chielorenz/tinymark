@@ -1,20 +1,20 @@
-export interface Token {
-	readonly type: string;
-	readonly value: string;
-}
-
-export interface Buffer {
-	readonly value: string;
-	readonly match: string;
-	next: () => Buffer;
-	reset: () => Buffer;
-	readonly done: boolean;
-}
-
 export interface Lexer {
 	readonly token: Token;
 	next: () => Lexer;
 	peek: () => Lexer;
+	readonly done: boolean;
+}
+
+interface Token {
+	readonly type: string;
+	readonly value: string;
+}
+
+interface Buffer {
+	readonly value: string;
+	readonly match: string;
+	next: () => Buffer;
+	reset: () => Buffer;
 	readonly done: boolean;
 }
 
@@ -54,6 +54,10 @@ const matchWord = (buf: Buffer): Buffer =>
 	isWord(buf) ? matchWord(buf.next()) : buf;
 
 function next(buf: Buffer, peek: boolean = false): Lexer {
+	if (buf.done) {
+		return lexer(token("oef", ""), buf);
+	}
+
 	if (isWS(buf)) {
 		const ws = matchWS(buf.next());
 		return lexer(token("ws", ws.match), peek ? buf : ws.reset());
@@ -72,7 +76,7 @@ function next(buf: Buffer, peek: boolean = false): Lexer {
 		return lexer(token("word", word.match), peek ? buf : word.reset());
 	}
 
-	return lexer(token("other", buf.value), peek ? buf : buf.reset());
+	throw new Error(`Invalid character "${buf.value}"`);
 }
 
 const useLexer = (string: string): Lexer => lexer(token(), buffer(string));
