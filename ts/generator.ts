@@ -18,6 +18,8 @@ const generate = (...nodes: (Node | string)[]): string => {
 	switch (node.type) {
 		case "p":
 			return `<p>${content}</p>`;
+		case "h1":
+			return `<h1>${content}</h1>`;
 		default:
 			return content;
 	}
