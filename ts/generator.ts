@@ -14,14 +14,15 @@ const generate = (...nodes: (Node | string)[]): string => {
 
 	log(`Generate "${node.type}"`);
 
-	const content = generate(...node.value, ...rest);
+	const nodeContent = generate(...node.value);
+	const restContent = generate(...rest);
 	switch (node.type) {
 		case "p":
-			return `<p>${content}</p>`;
+			return `<p>${nodeContent}</p>${restContent}`;
 		case "h1":
-			return `<h1>${content}</h1>`;
+			return `<h1>${nodeContent}</h1>${restContent}`;
 		default:
-			return content;
+			return `${nodeContent}${restContent}`;
 	}
 };
 
