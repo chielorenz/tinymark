@@ -1,6 +1,5 @@
-import lexer from "./lexer.js";
-lexer.eat(`# tinymark 
-Hello world!`);
-while (!lexer.done) {
-    console.log(lexer.next());
-}
+import useCompiler from "./src/compiler.js";
+const input = `# Hello, world!`;
+const compiler = useCompiler(input);
+const output = compiler.compile();
+console.log(output);
