@@ -1,3 +1,6 @@
+// Parser for a tiny subset of the markdown syntax. It's an hand coded,
+// predictive (no backtracking), recursive descending parser.
+
 // BNF(-ish) notation
 // Note: terminals starting with % (like %ws) are tokens (syntactic
 // categories) of the lexer.

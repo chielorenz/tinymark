@@ -59,39 +59,42 @@ See the [development](#development) section for a list of usefull commands.
 
 ## 📚 Lexer
 
-`lexer.js` is a simple, hand written lexer that recognize the markdown syntax.
+`lexer.ts` is a simple lexer that recognize a tiny subset of the markdown syntax.
 
-It takes a markdown string and returns a set of tokens, each token has a category an a lexeme. For example:
+It takes a markdown string and returns a set of tokens, each token has a type and a value:
 
-``` js
-import lexer from "./lexer.js";
+``` typescript
+import useLexer from "./src/lexer.js";
 
-lexer.feed("# Hello Word!");
+const input = `# Hello, World!`;
+let lexer = useLexer(input);
 
-let token;
 while (!lexer.done) {
-	token = lexer.next();
-	console.log(token);
+	lexer = lexer.next();
+	console.log(lexer.token);
 }
 
 // Prints:
-{ category: 'hash', lexeme: '#' }
-{ category: 'ws', lexeme: ' ' }
-{ category: 'text', lexeme: 'Hello' }
-{ category: 'ws', lexeme: ' ' }
-{ category: 'text', lexeme: 'Word!' }
+{ type: 'hash', value: '#' }
+{ type: 'ws', value: ' ' }
+{ type: 'word', value: 'Hello,' }
+{ type: 'ws', value: ' ' }
+{ type: 'word', value: 'World!' }
 ```
 
 ## 📖 Parser
 
-`parser.js` is a parser for a tiny subset of the markdown syntax. It'a an hand coded, predictive (no backtracking), recursive descending parser. Given a lexer it returns an abstract syntax tree (AST) that represents the input string.
+`parser.ts` is a simple parser for a tiny subset of the markdown syntax. 
 
-``` js
-import lexer from "./lexer.js";
-import parser from "./parser.js";
+It'a an hand coded, predictive (no backtracking), recursive descending parser. Given a lexer it returns an abstract syntax tree (AST) that represents the input string.
 
-lexer.feed("# Hello Word!");
-parser.use(lexer);
+``` typescript
+import useLexer from "./src/lexer.js";
+import useParser from "./src/parser.js";
+
+const input = `# Hello, World!`;
+const lexer = useLexer(input);
+const parser = useParser(lexer);
 const ast = parser.parse();
 console.log(ast);
 
@@ -108,14 +111,14 @@ console.log(ast);
             {
               type: 'h1',
               value: [
-                { type: 'hash', value: '#' },
                 {
                   type: 'text',
                   value: [
-                    { type: 'word', value: 'Hello' },
+                    { type: 'word', value: [ 'Hello,' ] },
+                    { type: 'ws', value: [ ' ' ] },
                     {
                       type: 'text',
-                      value: [ { type: 'word', value: 'Word!' } ]
+                      value: [ { type: 'word', value: [ 'World!' ] } ]
                     }
                   ]
                 }
@@ -129,23 +132,43 @@ console.log(ast);
 }
 ```
 
-## ✍️ Coder 
+## ✍️ Generator 
 
-`coder.js` is a simple code generator that takes an AST and returns a string of html.
+`generator.ts` is a simple code generator that can build html from a tiny subset of the markdown syntax.
 
-``` js
+It takes an AST and returns a string of html.
+
+``` typescript
 import lexer from "./lexer.js";
 import parser from "./parser.js";
 import coder from "./coder.js";
 
-lexer.feed("# Hello Word!");
-parser.use(lexer);
-coder.use(parser);
-const html = coder.make();
+const input = `# Hello, World!`;
+const lexer = useLexer(input);
+const parser = useParser(lexer);
+const generator = useGenerator(parser);
+const html = generator.generate();
 console.log(html);
 
 // Prints:
-<h1>Hello Word!</h1>
+<h1>Hello, World!</h1>
+```
+
+## 📝 Compiler
+`compiler.ts` is a simple compiler that can build html from a tiny subset of the markdown syntax.
+
+It glues togheter the lexer, parser and generator. It takes a markdown string and returns a string of html.
+
+``` typescript
+import useCompiler from "./src/compiler.js";
+
+const input = `# Hello, World!`;
+const compiler = useCompiler(input);
+const html = compiler.compile();
+console.log(html);
+
+// Prints:
+<h1>Hello, World!</h1>
 ```
 
 ## 🚧 Avaiable syntax
