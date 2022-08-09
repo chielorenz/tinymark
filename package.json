@@ -1,8 +1,11 @@
 {
 	"name": "tinymark",
-	"description": "Proof of concept lexer, parser, and compiler for a tiny subset of the Markdown syntax",
+	"description": "Proof of concept hand written compiler for a tiny subset of the Markdown syntax",
 	"version": "0.0.1",
 	"type": "module",
+	"bin": {
+		"tinymark": "./bin/tinymark.js"
+	},
 	"scripts": {
 		"nodemon": "nodemon",
 		"ts-node": "ts-node",

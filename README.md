@@ -10,6 +10,16 @@ TinyMark is in very early development and is meant for educational purposes only
 
 todo -->
 
+## 🚀 Usage
+
+You can run it from your terminal with:
+
+``` bash
+npx github:b1n01/tinymark '# Hello, World!'
+
+# <h1>Hello, World!</h1>
+```
+
 ## <a name="development"></a>👩‍💻 Development
 
 Install dependencies with:
