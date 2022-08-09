@@ -151,7 +151,7 @@ const html = generator.generate();
 console.log(html);
 
 // Prints:
-<h1>Hello, World!</h1>
+// <h1>Hello, World!</h1>
 ```
 
 ## 📝 Compiler
@@ -168,7 +168,7 @@ const html = compiler.compile();
 console.log(html);
 
 // Prints:
-<h1>Hello, World!</h1>
+// <h1>Hello, World!</h1>
 ```
 
 ## 🚧 Avaiable syntax
