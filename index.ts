@@ -1,4 +1,4 @@
-import useCompiler from "./ts/compiler.js";
+import useCompiler from "./src/compiler.js";
 
 const input = `# Hello, world!`;
 const compiler = useCompiler(input);
