@@ -1,23 +1,5 @@
-// BNF(-ish) notation
-// Note: terminals starting with % (like %ws) are tokens (syntactic
-// categories) of the lexer.
-//
-// main -> row %nl main
-//     | row
-//
-// row -> %ws* content %ws*
-//     | %ws*
-//
-// content -> p
-//     | h1
-//
-// p -> text
-//
-// h1 -> %hash %ws+ text
-//     | %hash
-//
-// text -> %word %ws+ text
-//     | %word
+// Parser for a tiny subset of the markdown syntax. It's an hand coded,
+// predictive (no backtracking), recursive descending parser.
 import { useLog, useLogDeep } from "./utils.js";
 const log = useLog("Parser |");
 const logDeep = useLogDeep("Parser |");

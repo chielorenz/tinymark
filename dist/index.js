@@ -1,5 +1,5 @@
 import useCompiler from "./src/compiler.js";
-const input = `# Hello, world!`;
+const input = `# Hello, World!`;
 const compiler = useCompiler(input);
-const output = compiler.compile();
-console.log(output);
+const html = compiler.compile();
+console.log(html);
