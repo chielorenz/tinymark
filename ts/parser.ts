@@ -2,15 +2,19 @@
 // Note: terminals starting with % (like %ws) are tokens (syntactic
 // categories) of the lexer.
 //
-// main -> content
+// main -> row %nl main
+//     | row
+//
+// row -> %ws* content %ws*
+//     | %ws*
 //
 // content -> p
 //     | h1
 //
+// p -> text
+//
 // h1 -> %hash %ws+ text
 //     | %hash
-//
-// p -> text
 //
 // text -> %word %ws+ text
 //     | %word
@@ -35,11 +39,17 @@ const node = (type: string, ...value: (Node | string)[]): Node => ({
 });
 
 const is = (type: string, lexer: Lexer) => lexer.token.type === type;
+
 const isWS = (lexer: Lexer) => is("ws", lexer);
+
 const isWord = (lexer: Lexer) => is("word", lexer);
+
 const isHash = (lexer: Lexer) => is("hash", lexer);
 
+const isLB = (lexer: Lexer) => is("lb", lexer);
+
 const isP = (lexer: Lexer) => isText(lexer);
+
 const isText = (lexer: Lexer): boolean =>
 	(isWord(lexer) && isWS(lexer.next()) && isText(lexer.next().next())) ||
 	isWord(lexer);
@@ -47,6 +57,13 @@ const isText = (lexer: Lexer): boolean =>
 const isH1 = (lexer: Lexer) =>
 	(isHash(lexer) && isWS(lexer.next()) && isText(lexer.next().next())) ||
 	isHash(lexer);
+
+const isContent = (lexer: Lexer) => isP(lexer) || isH1(lexer);
+
+const isRow = (lexer: Lexer) =>
+	isWS(lexer) ||
+	(isWS(lexer) && isContent(lexer.next())) ||
+	(isWS(lexer) && isContent(lexer.next()) && isWS(lexer.next().next()));
 
 const match = (type: string, lexer: Lexer): [Node, Lexer] => {
 	log(`Match "${type}"`);
@@ -110,11 +127,51 @@ const matchContent = (lexer: Lexer): [Node, Lexer] => {
 	);
 };
 
+const matchRow = (lexer: Lexer): [Node, Lexer] => {
+	log(`Match "row"`);
+
+	if (isWS(lexer)) {
+		const [ws, wsLexer] = match("ws", lexer);
+
+		if (isContent(wsLexer)) {
+			const [content, contentLexer] = matchContent(wsLexer);
+
+			if (isWS(contentLexer)) {
+				const [otherWs, otherWsLexer] = match("ws", contentLexer);
+				return [node("row", ws, content, otherWs), otherWsLexer];
+			}
+
+			return [node("row", ws, content), contentLexer];
+		}
+
+		return [node("row", ws), wsLexer];
+	} else {
+		if (isContent(lexer)) {
+			const [content, contentLexer] = matchContent(lexer);
+
+			if (isWS(contentLexer)) {
+				const [ws, wsLexer] = match("ws", contentLexer);
+				return [node("row", content, ws), wsLexer];
+			}
+
+			return [node("row", content), contentLexer];
+		}
+	}
+
+	return [node("row"), lexer];
+};
+
 const matchMain = (lexer: Lexer): [Node, Lexer] => {
 	log(`Match "main"`);
 
-	const [content, contentLexer] = matchContent(lexer);
-	return [node("main", content), contentLexer];
+	const [row, rowLexer] = matchRow(lexer);
+	if (isLB(rowLexer)) {
+		const [lb, lbLexer] = match("lb", rowLexer);
+		const [main, mainLexer] = matchMain(lbLexer);
+		return [node("main", row, lb, main), mainLexer];
+	}
+
+	return [node("main", row), rowLexer];
 };
 
 const useParser = (lexer: Lexer) => ({
