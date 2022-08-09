@@ -69,11 +69,11 @@ function next(buf: Buffer, peek: boolean = false): Lexer {
 	}
 
 	if (isLB(buf)) {
-		return lexer(token("lb", buf.value), peek ? buf : buf.reset().next());
+		return lexer(token("lb", buf.value), peek ? buf : buf.next().reset());
 	}
 
 	if (isHash(buf)) {
-		return lexer(token("hash", buf.value), peek ? buf : buf.reset().next());
+		return lexer(token("hash", buf.value), peek ? buf : buf.next().reset());
 	}
 
 	if (isWord(buf)) {
