@@ -1,3 +1,6 @@
+import { useLog } from "./utils.js";
+const log = useLog("Lexer |");
+
 export interface Lexer {
 	readonly token: Token;
 	next: () => Lexer;
@@ -54,6 +57,8 @@ const matchWord = (buf: Buffer): Buffer =>
 	isWord(buf) ? matchWord(buf.next()) : buf;
 
 function next(buf: Buffer, peek: boolean = false): Lexer {
+	log(`Next on "${buf.value}"`);
+
 	if (buf.done) {
 		return lexer(token("oef", ""), buf);
 	}
@@ -73,6 +78,7 @@ function next(buf: Buffer, peek: boolean = false): Lexer {
 
 	if (isWord(buf)) {
 		const word = matchWord(buf.next());
+		log(`Next is "${word.match}"`);
 		return lexer(token("word", word.match), peek ? buf : word.reset());
 	}
 
