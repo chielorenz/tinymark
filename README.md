@@ -15,7 +15,7 @@ todo -->
 You can run it from your terminal with:
 
 ``` bash
-npx github:b1n01/tinymark '# Hello, World!'
+npx github:chielorenz/tinymark '# Hello, World!'
 
 # <h1>Hello, World!</h1>
 ```
